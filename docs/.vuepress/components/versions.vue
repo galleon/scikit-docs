@@ -44,7 +44,7 @@ export default {
       this.options.unshift({ value: "main", text: "dev" });
       const path = window.location.pathname.toLowerCase();
       if (path.startsWith("/scikit-docs/version/")) {
-        const start = 21; // len("/version/scikit-docs/")
+        const start = len("/version/scikit-docs/");
         const end = path.indexOf("/", start);
         this.selected = path.substring(start, end);
       } else {
@@ -57,10 +57,10 @@ export default {
       const targetVersionPath =
         this.selected === "main" ? "" : `/version/${this.selected}`;
       const path = window.location.pathname.toLowerCase();
-      let startIdx = 12; // len("/scikit-docs")
+      let startIdx = len("/scikit-docs");
       const versionIdx = path.indexOf("/version/");
       if (versionIdx >= 0) {
-        startIdx = versionIdx + 9; // len("/version/")
+        startIdx = versionIdx + len("/version/");
       }
 
       const endIdx = path.indexOf("/", startIdx);
@@ -69,6 +69,10 @@ export default {
         window.location.pathname.substring(0, 12) +
         targetVersionPath +
         window.location.pathname.substring(endIdx);
+      console.log(
+        window.location.pathname,
+        window.location.pathname.substring(0, 12)
+      );
     },
   },
 };
