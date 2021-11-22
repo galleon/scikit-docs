@@ -17,14 +17,9 @@ jobs:
       DOCS_VERSION_PATH: /
 
     steps:
-      - run: |
-          echo "Building docs for version: ${{ github.event.inputs.release-version }}"
-          env | grep GITHUB_
-
       - name: Update DOCS_VERSION_PATH
         run: |
             echo SK_VERSION=v"${{ github.event.inputs.release-version }}" >> $GITHUB_ENV
-            # replace v with nothing in release-version
             echo DOCS_VERSION_PATH=version/"${{ github.event.inputs.release-version }}"/ >> $GITHUB_ENV
 
       - name: Set env variables for github+binder links in doc
@@ -34,9 +29,21 @@ jobs:
           echo "AUTODOC_NOTEBOOKS_REPO_URL=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" >> $GITHUB_ENV
           echo "AUTODOC_NOTEBOOKS_BRANCH=${SK_VERSION}" >> $GITHUB_ENV
 
+      # According to Alex we don't need scikit-decide source code to build docs
+      # - name: Clone airbus/scikit-decide
+      #   uses: actions/checkout@v2
+      #   with:
+      #     repository: airbus/scikit-decide
+      #     ref: v${{ github.event.inputs.release-version }}
+      #     path: scikit-decide
+
       - uses: actions/checkout@v2
-        with:
-          ref: v${{ github.event.inputs.release-version }}
+        # with:
+        #   path: scikit-docs
+
+      - run: |
+            ls -l
+            env | grep GITHUB_
 
       - name: Setup python
         uses: actions/setup-python@v2
@@ -49,8 +56,8 @@ jobs:
 
       - name: generate documentation
         run: |
-          (cd docs && python autodoc.py)
-          yarn install && yarn docs:build && touch docs/.vuepress/dist/.nojekyll
+          # (cd scikit-decide/docs && python autodoc.py)
+          yarn install && yarn docs:build
 
       - name: upload as artifact
         uses: actions/upload-artifact@v2
@@ -59,10 +66,22 @@ jobs:
           path: docs/.vuepress/dist
 
       - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@4.1.5
+        uses: JamesIves/github-pages-deploy-action@4.1.6
         with:
+          repository-name: galleon/scikit-docs
           branch: gh-pages # The branch the action should deploy to.
           folder: docs/.vuepress/dist # The folder the action should deploy.
           target-folder: ${{ env.DOCS_VERSION_PATH }} # The folder the action should deploy to.
+          commit-message: publish documentation
+          clean: false # Releasing a new version is about creating a new directory, so we don't want to clean up the root.
+
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.6
+        with:
+          repository-name: galleon/scikit-docs
+          branch: gh-pages # The branch the action should deploy to.
+          folder: docs/.vuepress/dist # The folder the action should deploy.
+          target-folder: / # The folder the action should deploy to.
           commit-message: publish documentation
           clean: false # Releasing a new version is about creating a new directory, so we don't want to clean up the root.

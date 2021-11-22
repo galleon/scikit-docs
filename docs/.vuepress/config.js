@@ -2,7 +2,7 @@ module.exports = {
     lang: 'en-US',
     title: 'Scikit-decide',
     description: 'This is scikit-decide documentation site',
-    base: `/scikit-decide${process.env.DOCS_VERSION_PATH || '/'}`,
+    base: `/scikit-docs${process.env.DOCS_VERSION_PATH || '/'}`,
 
     locales: {
         '/': {
@@ -13,7 +13,7 @@ module.exports = {
     },
 
     themeConfig: {
-        repo: 'airbus/scikit-decide',
+        repo: 'galleon/scikit-docs',
         logo: '/logo.svg',
         editLinks: false,
         docsDir: '',
